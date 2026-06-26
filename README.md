@@ -4,8 +4,6 @@
 
 A full end-to-end data science pipeline that extracts text from over 1,300 PDFs, PowerPoints, and Word documents, trains four competing machine learning classifiers, and surfaces everything through an interactive Streamlit dashboard — complete with a live prediction interface where any pasted text is instantly routed to its course and module.
 
-<br>
-
 ## Table of Contents
 
 - [Overview](#overview)
@@ -19,8 +17,6 @@ A full end-to-end data science pipeline that extracts text from over 1,300 PDFs,
 - [Visualisations Produced](#visualisations-produced)
 - [Tech Stack](#tech-stack)
 
-<br>
-
 ## Overview
 
 Academic institutions accumulate thousands of lecture notes, slides, syllabi, and reference materials spread across many courses. Manually routing each document to the correct course and module is error-prone and time-consuming. This project builds a multi-class NLP classifier that:
@@ -30,74 +26,44 @@ Academic institutions accumulate thousands of lecture notes, slides, syllabi, an
 - Achieves **≥ 80% cross-validated accuracy** and **macro F1 ≥ 0.75**
 - Exposes all of this through a production-quality interactive dashboard
 
-<br>
-
 ## Architecture
 
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                        Source Documents (Files/)                        │
-│          PDFs · PowerPoints · Word Documents  (~1,300 files)            │
-└───────────────────────────────────┬─────────────────────────────────────┘
-                                    │
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────────┐
-│                          extract_data.py                                │
-│                                                                         │
-│  ┌──────────────┐   ┌──────────────┐   ┌──────────────┐                │
-│  │  PyMuPDF     │   │  python-pptx │   │  python-docx │                │
-│  │  PDF → text  │   │  PPTX → text │   │  DOCX → text │                │
-│  └──────┬───────┘   └──────┬───────┘   └──────┬───────┘                │
-│         └──────────────────┼──────────────────┘                        │
-│                            │                                            │
-│             Folder path → course code + module label                   │
-│             e.g.  DSA(BCSE202L)/MODULE-3/slides.pptx                   │
-│                            │                                            │
-│                            ▼                                            │
-│                  academic_documents_full.csv                            │
-│        [ filename · course · module · doc_type · content ]             │
-└───────────────────────────────────┬─────────────────────────────────────┘
-                                    │
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────────┐
-│                          project_da2.py                                 │
-│                                                                         │
-│   Section 1  →  Data loading & shape inspection                        │
-│   Section 2  →  Problem statement & success criteria                   │
-│   Section 3  →  Cleaning · feature engineering · class encoding        │
-│   Section 4  →  EDA (14 charts) · chi-square · TF-IDF keywords         │
-│                                                                         │
-│   Section 5  →  Model Selection & Training                             │
-│   ┌────────────────┐  ┌────────────┐  ┌───────────────┐  ┌──────────┐ │
-│   │ Logistic       │  │ Linear SVM │  │ Random Forest │  │  Naive   │ │
-│   │ Regression     │  │            │  │  (n=200)      │  │  Bayes   │ │
-│   └────────────────┘  └────────────┘  └───────────────┘  └──────────┘ │
-│         └───────────────────┬──────────────────────────────┘           │
-│                             │  5-fold Stratified CV                    │
-│                             ▼                                           │
-│                     Best model selected                                 │
-│                     80/20 hold-out evaluation                          │
-│                                                                         │
-│   Section 6  →  Performance charts (confusion matrix, per-class F1)   │
-│   Section 7  →  SQLite export (academic_docs.db)                       │
-└───────────────────────────────────┬─────────────────────────────────────┘
-                                    │
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────────┐
-│                         streamlit_app.py                                │
-│                                                                         │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐                  │
-│  │  Dashboard   │  │ EDA Explorer │  │  Model Lab   │                  │
-│  │  KPIs + dist │  │ 5 chart tabs │  │  CV results  │                  │
-│  └──────────────┘  └──────────────┘  └──────────────┘                  │
-│  ┌──────────────┐  ┌────────────────────────────────┐                  │
-│  │    Live      │  │      Document Universe         │                  │
-│  │  Predictor   │  │  3D / 2D SVD scatter plot      │                  │
-│  └──────────────┘  └────────────────────────────────┘                  │
-└─────────────────────────────────────────────────────────────────────────┘
-```
+```mermaid
+flowchart TD
+    A["Source Documents — Files/\nPDFs · PowerPoints · Word Documents\n~1,300 files"] --> B
 
-<br>
+    subgraph B["extract_data.py"]
+        direction TB
+        B1["PyMuPDF\nPDF → text"] & B2["python-pptx\nPPTX → text"] & B3["python-docx\nDOCX → text"] --> B4["Folder path → course code + module label\ne.g. DSA(BCSE202L)/MODULE-3/slides.pptx"]
+        B4 --> B5["academic_documents_full.csv\nfilename · course · module · doc_type · content"]
+    end
+
+    B5 --> C
+
+    subgraph C["project_da2.py"]
+        direction TB
+        C1["Section 1–2  Data loading & problem statement"] --> C2
+        C2["Section 3  Cleaning · feature engineering · class encoding"] --> C3
+        C3["Section 4  EDA — 14 charts · chi-square · TF-IDF keywords"] --> C4
+
+        subgraph C4["Section 5  Model Selection"]
+            direction LR
+            M1["Logistic\nRegression"] & M2["Linear\nSVM"] & M3["Random\nForest"] & M4["Naive\nBayes"]
+        end
+
+        C4 --> C5["5-fold Stratified Cross-Validation"]
+        C5 --> C6["Best model selected\n80/20 hold-out evaluation"]
+        C6 --> C7["Section 6  Confusion matrix · per-class F1 · PCA · feature importance"]
+        C7 --> C8["Section 7  SQLite export → academic_docs.db\ndocuments · predictions · model_comparison · per_class_metrics"]
+    end
+
+    C8 --> D
+
+    subgraph D["streamlit_app.py — Interactive Dashboard"]
+        direction LR
+        D1["Dashboard\nKPIs + distributions"] & D2["EDA Explorer\n5 chart tabs"] & D3["Model Lab\nCV results + confusion matrix"] & D4["Live Predictor\nPaste text → course + module"] & D5["Document Universe\n3D / 2D SVD scatter"]
+    end
+```
 
 ## Pipeline Stages
 
@@ -175,8 +141,6 @@ Results are written to `academic_docs.db` (SQLite) with four tables:
 | `model_comparison` | 5-fold CV scores for all four models |
 | `per_class_metrics` | Precision, recall, F1, support per course |
 
-<br>
-
 ## Project Structure
 
 ```
@@ -210,8 +174,6 @@ FDS/
 └── FDS_Report.pdf
 ```
 
-<br>
-
 ## Courses Covered
 
 | Course Code | Short Label | Subject |
@@ -232,8 +194,6 @@ FDS/
 | BMAT202L | PS | Probability & Statistics |
 | BCSE304L | TOC | Theory of Computation |
 | BCSE203E | WP | Web Programming |
-
-<br>
 
 ## Models & Performance
 
@@ -264,8 +224,6 @@ Naive Bayes          Strong baseline for text; assumes feature independence
 - Macro-averaged F1 ≥ 0.75
 
 The module-level classifier (secondary task) is a Logistic Regression trained only on documents whose module label is known and with at least 3 examples.
-
-<br>
 
 ## Dashboard Pages
 
@@ -310,8 +268,6 @@ Navigation bar
       Explained variance badges for all 3 components
 ```
 
-<br>
-
 ## Getting Started
 
 **1. Install dependencies**
@@ -355,8 +311,6 @@ streamlit run streamlit_app.py
 
 Open `http://localhost:8501` in a browser. The app caches data loading and model training on first run; subsequent page switches are instant.
 
-<br>
-
 ## Visualisations Produced
 
 | Figure | Description |
@@ -375,8 +329,6 @@ Open `http://localhost:8501` in a browser. The app caches data loading and model
 | `fig12_feature_importance.png` | Grid — top 10 LR coefficients per course |
 | `fig13_document_pca.png` | 2D scatter — TF-IDF → SVD projection, coloured by course |
 | `fig14_keyword_overlap.png` | Heatmap — shared top-200 TF-IDF terms between course pairs |
-
-<br>
 
 ## Tech Stack
 
