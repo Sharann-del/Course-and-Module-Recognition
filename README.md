@@ -29,7 +29,6 @@ Academic institutions accumulate thousands of lecture notes, slides, syllabi, an
 ## Architecture
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': {'clusterBkg': 'transparent', 'clusterBorder': '#555555'}}}%%
 flowchart TD
     A["Source Documents — Files/\nPDFs · PowerPoints · Word Documents\n~1,300 files"] --> B
 
