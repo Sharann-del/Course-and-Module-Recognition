@@ -1,4 +1,4 @@
-# Academic Document Intelligence Platform
+# Course and Module Identifier Platform
 
 **Automated NLP classification of academic course materials across 16 university subjects**
 
