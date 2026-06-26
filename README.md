@@ -29,6 +29,7 @@ Academic institutions accumulate thousands of lecture notes, slides, syllabi, an
 ## Architecture
 
 ```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {'clusterBkg': 'transparent', 'clusterBorder': '#555555'}}}%%
 flowchart TD
     A["Source Documents — Files/\nPDFs · PowerPoints · Word Documents\n~1,300 files"] --> B
 
@@ -63,6 +64,11 @@ flowchart TD
         direction LR
         D1["Dashboard\nKPIs + distributions"] & D2["EDA Explorer\n5 chart tabs"] & D3["Model Lab\nCV results + confusion matrix"] & D4["Live Predictor\nPaste text → course + module"] & D5["Document Universe\n3D / 2D SVD scatter"]
     end
+
+    style B fill:transparent,stroke:#555555
+    style C fill:transparent,stroke:#555555
+    style C4 fill:transparent,stroke:#555555
+    style D fill:transparent,stroke:#555555
 ```
 
 ## Pipeline Stages
