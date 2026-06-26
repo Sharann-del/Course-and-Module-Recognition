@@ -1,0 +1,21 @@
+# ── Core Data Science ──────────────────────────────────────
+numpy
+pandas
+scikit-learn
+scipy
+
+# ── Visualization ──────────────────────────────────────────
+matplotlib
+seaborn
+plotly
+
+# ── NLP / Text ─────────────────────────────────────────────
+PyMuPDF          # PDF extraction  (fitz)
+python-pptx      # PPTX extraction
+python-docx      # DOCX extraction
+
+# ── Dashboard ──────────────────────────────────────────────
+streamlit
+
+# ── Utilities ──────────────────────────────────────────────
+openpyxl         # Excel support

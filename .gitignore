@@ -1,0 +1,36 @@
+# Virtual environments
+venv/
+.venv/
+venvsource/
+env/
+ENV/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Large raw data files (gigabytes of academic documents)
+Final_FDS_Project_Review_1/Files/
+
+# Local tool settings
+.claude/
+
+# IDE
+.vscode/
+.idea/
